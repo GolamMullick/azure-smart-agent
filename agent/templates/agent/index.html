@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAgent — AI Travel Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #04080f;
+    --s1:      #080e1a;
+    --s2:      #0d1525;
+    --border:  #1a2740;
+    --cyan:    #00e5ff;
+    --green:   #00ff88;
+    --amber:   #ffb300;
+    --text:    #dce8f5;
+    --muted:   #4a6080;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 48px;
+    background: rgba(4,8,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    color: var(--cyan);
+  }
+  .logo span { color: var(--text); }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: 32px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-cta {
+    background: var(--cyan) !important;
+    color: var(--bg) !important;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-weight: 500 !important;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 60px;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.25);
+    padding: 6px 18px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.5; transform:scale(1.5); }
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.95;
+    letter-spacing: 4px;
+    margin-bottom: 24px;
+  }
+  h1 .c { color: var(--cyan); }
+  .sub {
+    color: var(--muted);
+    font-size: 1.1rem;
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+  .cta-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-primary {
+    background: var(--cyan);
+    color: var(--bg);
+    text-decoration: none;
+    padding: 14px 36px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #00ccee; transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    padding: 14px 36px;
+    font-weight: 400;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* TOOLS SECTION */
+  .tools {
+    position: relative;
+    z-index: 1;
+    padding: 80px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--cyan);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 3px;
+    margin-bottom: 48px;
+  }
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+  }
+  .tool-card {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    padding: 32px 24px;
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .tool-card:hover {
+    background: var(--s2);
+    border-color: var(--cyan);
+    transform: translateY(-4px);
+  }
+  .tool-icon { font-size: 2rem; margin-bottom: 16px; }
+  .tool-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--cyan);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .tool-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+  /* API SECTION */
+  .api-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+    border-top: 1px solid var(--border);
+  }
+  .api-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  @media (max-width: 700px) { .api-grid { grid-template-columns: 1fr; } }
+  .api-card {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .method {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-right: 10px;
+  }
+  .post { background: rgba(0,255,136,0.15); color: var(--green); }
+  .get  { background: rgba(0,229,255,0.15); color: var(--cyan); }
+  .del  { background: rgba(255,179,0,0.15);  color: var(--amber); }
+  .endpoint {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    display: block;
+    margin: 12px 0 8px;
+  }
+  .api-desc { font-size: 0.82rem; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Smart<span>Agent</span></div>
+  <div class="nav-links">
+    <a href="#tools">Tools</a>
+    <a href="#api">API</a>
+    <a href="/chat/" class="nav-cta">Launch Chat →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="tag">Powered by Azure OpenAI — Live</div>
+  <h1>AI TRAVEL<br><span class="c">AGENT</span></h1>
+  <p class="sub">
+    A production-grade AI agent built with Django REST Framework and Azure OpenAI.
+    Real tool calling, persistent sessions, REST API.
+  </p>
+  <div class="cta-group">
+    <a href="/chat/" class="btn-primary">Open Chat Interface</a>
+    <a href="/api/health/" class="btn-outline">View API Health</a>
+  </div>
+</section>
+
+<section class="tools" id="tools">
+  <div class="section-label">// capabilities</div>
+  <div class="section-title">AVAILABLE TOOLS</div>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tool-icon">✈️</div>
+      <div class="tool-name">search_flights</div>
+      <div class="tool-desc">Search available flights between any two cities with pricing and schedules.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon">🏨</div>
+      <div class="tool-name">search_hotels</div>
+      <div class="tool-desc">Find hotels at any destination with ratings and pricing per night.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon">🌤️</div>
+      <div class="tool-name">get_weather</div>
+      <div class="tool-desc">Real-time weather conditions for any city worldwide.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon">🎫</div>
+      <div class="tool-name">book_flight</div>
+      <div class="tool-desc">Book flights with confirmation codes and passenger details.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon">📍</div>
+      <div class="tool-name">get_destination_info</div>
+      <div class="tool-desc">Visa requirements, currency, best travel times and budget info.</div>
+    </div>
+  </div>
+</section>
+
+<section class="api-section" id="api">
+  <div class="section-label">// rest api</div>
+  <div class="section-title">API ENDPOINTS</div>
+  <div class="api-grid">
+    <div class="api-card">
+      <span class="method post">POST</span>
+      <code class="endpoint">/api/chat/</code>
+      <div class="api-desc">Send a message to the AI agent. Supports multi-turn conversation with session management.</div>
+    </div>
+    <div class="api-card">
+      <span class="method get">GET</span>
+      <code class="endpoint">/api/session/&lt;id&gt;/</code>
+      <div class="api-desc">Retrieve full chat history for a session from the database.</div>
+    </div>
+    <div class="api-card">
+      <span class="method del">DELETE</span>
+      <code class="endpoint">/api/session/&lt;id&gt;/clear/</code>
+      <div class="api-desc">Clear all messages in a session while preserving the session record.</div>
+    </div>
+    <div class="api-card">
+      <span class="method get">GET</span>
+      <code class="endpoint">/api/health/</code>
+      <div class="api-desc">Health check — returns model name, endpoint and available tools list.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built with Django REST Framework + Azure OpenAI |
+  <a href="https://github.com/yourusername/smartagent">GitHub</a> |
+  Golam Fahad Mullick © 2025
+</footer>
+
+</body>
+</html>
